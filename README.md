@@ -1,4 +1,4 @@
-# Proyecto BD: Viajes de Taxi en Chicago
+# Proyecto BD: Premios lotería Texas
 
 ## Fuente de datos
 Para este proyecto se utilizaron los datos obtenidos del portal público de datos del estado de Texas sobre la lista de ganadores de premio de loteria (actualizada por última vez el 30 de abril de 2024). Se consultar los datos en [este link]([https://data.cityofchicago.org/Transportation/Taxi-Trips-2024-/ajtu-isnz/about_data](https://data.texas.gov/dataset/Winners-List-of-Texas-Lottery-Prizes/54pj-3dxy/about_data)).
