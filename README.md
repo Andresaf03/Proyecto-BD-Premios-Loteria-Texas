@@ -1,7 +1,7 @@
 # Proyecto BD: Viajes de Taxi en Chicago
 
 ## Fuente de datos
-Para este proyecto se utilizaron los datos obtenidos del portal público de datos del estado de Chicago sobre viajes de taxi en 2024 (enero-abril). Se consultar los datos en [este link](https://data.cityofchicago.org/Transportation/Taxi-Trips-2024-/ajtu-isnz/about_data).
+Para este proyecto se utilizaron los datos obtenidos del portal público de datos del estado de Texas sobre la lista de ganadores de premio de loteria (actualizada por última vez el 30 de abril de 2024). Se consultar los datos en [este link]([https://data.cityofchicago.org/Transportation/Taxi-Trips-2024-/ajtu-isnz/about_data](https://data.texas.gov/dataset/Winners-List-of-Texas-Lottery-Prizes/54pj-3dxy/about_data)).
 
 ## Carga inicial de datos
 
@@ -9,8 +9,8 @@ Para insertar los datos en bruto en una sola tabla que los contenga todos se deb
 
 ```{postgresql}
 \copy
-    raw_data.viajes_taxi (trip_id, taxi_id, inicio_viaje, fin_viaje, segundos_de_viaje, num_millas, zona_censal_recogida, zona_censal_dejada, area_comunitaria_recogida, area_comunitaria_dejada, tarifa, propina, peaje, cargos_extra, pago_total, tipo_de_pago, compania_taxi, latitud_recogida, longitud_recogida, locaclizacion_recogida, latitud_dejada, longitud_dejada, localizacion_dejada)
-    FROM 'direccion_de_descarga_completa.csv'
+    raw_data.loteria (row_id, numero_reclamo, cantidad_ganada, fecha_reclamo_pagado, id_jugador, indicador_anualidad, indicador_anonimo, ubicacion_centro_reclamo, tipo_reclamo, ciudadano_usa, jugador_apellido, jugador_nombre, nombre_y_id_jugador, ciudad_jugador, estado_jugador, condado_jugador, pais_jugador, especie_dinero, tipo_loteria, fecha_draw, momento_dia_draw, nivel_premio, fecha_venta_ticket, numero_ticket, costo_ticket, numero_comerciante, nombre_comerciante, numero_nombre_comerciante, direccion1_comerciante, direccion2_comerciante, ciudad_comerciante, estado_comerciante, codigo_zip_comerciante, codigo_zip4_comerciante, condado_comerciante)
+    FROM '/Users/andres/Desktop/Winners_List_of_Texas_Lottery__Prizes_20240507.csv'
     WITH (FORMAT CSV, HEADER true, DELIMITER ',');
 ```
 
