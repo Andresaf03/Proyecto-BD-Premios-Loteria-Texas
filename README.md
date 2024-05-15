@@ -325,6 +325,7 @@ Al igual que el comerciante que más reclamos ha tenido, el que más premios ha 
     ORDER BY cantidad_ganada DESC;
   ```
 El país que más dinero ha recibido en premios es Estados Unidos, seguido de México, países sin reconocer y Canadá.
+![Pais](Varios/Pais.png)
 
   <li>Ciudad </li>
     
@@ -337,6 +338,7 @@ El país que más dinero ha recibido en premios es Estados Unidos, seguido de M�
     ORDER BY cantidad_ganada DESC;
   ```
 Las ciudades más ganadoras son aquellas en el interior o colindantes con Texas, la lista es encabezada por Houston con un total de 1340816899.26 dólares ganados.
+![Ciudad](Varios/Ciudad.png)
 
   <li>Estado </li>
     
@@ -349,6 +351,7 @@ Las ciudades más ganadoras son aquellas en el interior o colindantes con Texas,
     ORDER BY cantidad_ganada DESC;
   ```
 Naturalmente, el estado más ganador en cuánto a valor de premios es Texas con 12678872705.05 dólares.
+![Estado](Varios/Estado.png)
 
   <li>Condado </li>
     
@@ -362,6 +365,7 @@ Naturalmente, el estado más ganador en cuánto a valor de premios es Texas con 
     ORDER BY cantidad_ganada DESC;
   ```
 EL condado de Harris encabeza la lista de ganadores, con un total de 1416773477.47 dólares en premio.
+![Condado](Varios/Condado.png)
 
   </ol>
 <li>Cantidad de premios y reclamos por zip </li> 
