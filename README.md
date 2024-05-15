@@ -8,9 +8,7 @@
 
 
 ## Introducción al conjunto de datos y al problema a estudiar
-<p style="text-align: justify;">
 El presente conjunto de datos es una recopilación de premios de lotería ganados en Texas (cabe mencionar que los datos tomados fueron por última vez actualizados el 30 de abril de 2024 en el momento de extracción, aunque sean actualizados periódicamente, y fueron creados el 1 de septiembre de 2023, aunque hay registros anteriores al 2023). El conjunto de datos original consta de:
-</p>
 <ul>
     <li>35 columnas </li>
     <li>2.7 millones de renglones (cada uno es un registro de un premio ganado) </li>
@@ -25,22 +23,15 @@ Las columnas contienen información alrededor del premio que fue ganado, algunas
     <li>Información del jugador </li>
     <li>Información del comerciante </li>
 </ul>
-<p style="text-align: justify;">
 A primera vista el conjunto no está normalizado y existen aún ciertas dependencias multivaluadas que tendrán que ser corregidas para separar la información independiente en diferentes relaciones. De la misma manera, el conjunto de datos proporciona la información del premio ganado, del jugador y del comerciante que vendió el ticket de las diferentes loterias. La mayoría de los atributos estan en formato de texto simple y parece que hay algunos que pueden ser utilizados posteriormente como llaves primarias de las relaciones que se definirán en un futuro. Este conjunto de datos no es solo local, sino que incluye a ganadores de diferentes regiones del mundo, aunque los premios reclamados deben ser en Texas. Nuestro principal propósito es analizar, a través de consultas de SQL y conocimiento general de bases de datos, ciertos patrones observables en los ganadores y como se lleva a cabo la recopilación de datos y la recolección de premios. Esto es, aplicar los conocimientos aprendidos durante el curso para analizar una base de datos compleja, desde el ingesto inicial desde una fuente datos hasta la creación de atributos para un posible futuro entrenamiento de modelos. En cuanto a las consideraciones e implicaciones éticas consideramos que no hay ninguna, ya que la fuente de datos incluye la opción de mantenerse anónimo para ganadores de premios con valor mayor a 1 millon de dólares. El propósito de este repositorio es la explicación de las decisiones tomadas durante el proyecto para la realización de consultas analíticas y la replicación del mismo.
-</p>
 
 
 ## Fuente de datos
-<p style="text-align: justify;">
 Para este proyecto se utilizaron los datos obtenidos del portal público de datos del estado de Texas sobre la lista de ganadores de premios de loteria (actualizada por última vez el 30 de abril de 2024). Se consultar los datos en [este link](https://data.texas.gov/dataset/Winners-List-of-Texas-Lottery-Prizes/54pj-3dxy/about_data). 
-</p>
 
 
 ## Carga inicial de datos y análisis preeliminar
-
-<p style="text-align: justify;">
 Para insertar los datos en bruto en una sola tabla que los contenga todos se debe primero ejecutar el script `raw_data_esquema_tabla.sql` en el IDE de su preferencia. Posteriormente, en una sesión de terminal 'SQL Shell' crear una base de datos con un nombre a elección con el comando:
-</p>
 
 ```{postgresql}
 \CREATE DATABASE nombre_a_elegir;
@@ -62,8 +53,6 @@ De esta forma, ya se tendrá en el IDE una sola tabla con toda la información d
 
 
 ## Limpieza de datos
-
-<p style="text-align: justify;">
 El proceso de limpieza de datos se puede ver en el scrpit llamado: ```limpieza_datos.sql```. Este se realiza de tal manera que cada vez que se ejecute el script completo se hará la limpieza entera de los datos, desde la creación de cero del esquema y las consultas necesarias para ir limpiando las columnas que así lo requieran. Encontramos diversos problemas en esta tabla al momento de la limpieza que debimos solucionar:
   <ul>
     <li>Prácticamente todas las columnas no eran consistentes con su formato de texto (contenían caracteres en minúsculas y mayúsculas, y contenían espacios al inicio y final de los registros), por lo que lo solucionamos con funciones de TRIM() y UPPER(). </li>
@@ -77,15 +66,12 @@ El proceso de limpieza de datos se puede ver en el scrpit llamado: ```limpieza_d
     <li>Las columnas de tipo_loteria, momento_dia_draw y nivel_premio requirieron de una limpieza mínima para eliminar caracteres no desearlos y que los registros contenidos fueran consistentes. </li>
     <li>Había una gran cantidad de columnas que contenían valores nulos no explícitos (esto es, palabras para representar un valor nulo), por lo que los adaptamos el estándar y los hicimos nulos. </li>
   </ul>
-</p>
 
 Al finalizar la limpieza terminamos con una fuente de datos manejable y coherente en sus registros. Si bien es cierto que existen algunos valores nulos por falta de registros por parte de la fuente misma, creemos que la masividad de los datos nos permitirá extraer datos suficientemente relevantes,
 
-## Normalización de datos hasta cuarta forma normal
 
-<p style="text-align: justify;">
+## Normalización de datos hasta cuarta forma normal
 El proceso de normalización consiste en la descomposición de una entidad (tabla) en diversas para que mantengan ciertos requisitos (según la forma normal deseada) y obtengan coherencia. Este proceso fue realizado de tal forma que se puede consultar en el script `normalizacion.sql` y fue hecho de forma que se ejecute todo el script de corrido y en cualquier momento pueda ser eliminado para comenzar de nuevo. Algunos de los retos enfrentados en este proceso fueron: la organización de tablas según su id único, es decir, que una consulta general del tipo:
-</p>
 ```{postgresql}
 SELECT *
 FROM nombre_tabla;
@@ -130,18 +116,14 @@ Una vez termiando el análisis de las FDs y las MVDs pudimos normalizar hasta 4N
     <li>Zip4: {id, zip4} </li>
 </ul>
 
-<p style="text-align: justify;">
 Podemos observar que en esta descoposición ya no se encuentran FDs que no salgan de súper llaves ni MVDs que no salgan de súper llaves. Esto es, a partir de una llave en la tabla (en todas se les dió el nombre al atributo de id) podemos obtener la información única contenida en la tabla y ya no existe información independiente en la misma tabla, sino que fue separada para que hubiera coherencia. Finalmente, tenemos este esquema para las tablas:
-</p>
 
 ![ERD Loteria](Varios/ERD_Loteria.png)
 *Notar que las columnas suma_gamada, tardanza_recogida, veces_ganador, precio_ganancia y ganancia_promedio fueron añadidas posteriormente como atributos para entrenamiento de modelos.
 
-## Análisis de datos a través de consultas de SQL
 
-<p style="text-align: justify;">
+## Análisis de datos a través de consultas de SQL
 Se realizaron diversas consultas de SQL para el análisis de la base de datos, estas revelarán información valiosa que nos ayudará en nuestra conclusión para observar ciertos patrones de consumo, geolocalización y tipo de jugadores más propensos a ganar premios según atributos arbitrarios. A continuación se presentan las consultas realizadas (que pueden ser vistas en el script `querys.sql` que incluye igualmente el traspaso de las tablas al esquema público) con su correspondiente código y resultados.
-</p>
 
 <ol>
   <li>Suma de la cantidad ganada por cada jugador </li>
@@ -153,15 +135,18 @@ JOIN jugador ON jugador.id = premio.jugador_id
 GROUP BY jugador_id, jugador_nombre, jugador_apellido
 ORDER BY total_ganado DESC;
 ```
+Pudimos observar como, a pesar de estar sumando las cantidades de cada jugador (incluyendo ganancias múltiples), el jugador que más ganó en este período solamente jugó una vez y su cantidad total no fue alcanzada.
+
   <li>Número de reclamos pagados por año </li>
 
 ```{postgresql}
-SELECT EXTRACT(YEAR FROM fecha_pagado) AS año, tipo_reclamo, COUNT(id) AS reclamos_pagados
+SELECT EXTRACT(YEAR FROM fecha_pagado) AS año, COUNT(id) AS reclamos_pagados
 FROM reclamo
 WHERE reclamo.fecha_pagado IS NOT NULL
-GROUP BY año, tipo_reclamo
-ORDER BY reclamos_pagados, año, tipo_reclamo;
+GROUP BY año
+ORDER BY reclamos_pagados DESC, año;
 ```
+El año que más reclamos hubo fue el 2023 y el que menos que 1992. Parece haber un aumento gradual, con algunas excepciones, del número de reclamos al pasar los años.
   
   <li>Número de premios sin reclamar </li>
 
@@ -172,6 +157,8 @@ JOIN premio ON jugador.id = premio.jugador_id
 LEFT JOIN Reclamo  ON reclamo_id = reclamo.id
 WHERE reclamo.id IS NULL;
 ```
+No hubo premios sin reclamar, lo cuál es lógico porque la ingesta inicial de datos contenía un reclamo por cada premio.
+
   <li>Comerciante con mayor número de reclamos pagados </li>
 
 ```{postgresql}
@@ -187,6 +174,8 @@ SELECT *
 FROM total_reclamos_pagados
 WHERE reclamos_pagados = (SELECT MAX(reclamos_pagados) FROM total_reclamos_pagados);
 ```
+El comerciante con más reclamos fue "Colonies Food Mart" con 5685 reclamos, localizada en Texas (naturalmente). Esperabamos justamente que un comerciante con altos números de reclamos fuera alguno de compra cotidiana como un supermercado.
+
   <li>Jugador que ha ganado el premio más grande </li>
 
 ```{postgresql}
@@ -195,6 +184,8 @@ FROM jugador
 JOIN premio ON jugador.id = premio.jugador_id
 WHERE premio.cantidad_ganada = (SELECT MAX(cantidad_ganada) FROM premio);
 ```
+EL jugador que más ganó decidió permanecer anónimo con una suma acumulada de 157367045 dólares. Es un residente de San Diego que jugó MEGA MILLIONS una sola vez.
+
   <li>Jugador que ha ganado premios en todo los tipos de loteria </li>
 
 ```{postgresql}
@@ -207,6 +198,8 @@ JOIN (
 ) p ON jugador.id = p.jugador_id
 WHERE p.total_loterias = (SELECT COUNT(DISTINCT tipo_loteria) FROM premio);
 ```
+No hay ningún jugador registrado que haya ganado todos los tipos de lotería. Creemos que es un resultado lógico ya que los consumidores suelen preferir el mismo tipo de juego.
+
   <li>Cálculo del promedio de los 3 últimos premios por jugador </li>
 
 ```{postgresql}
@@ -215,6 +208,8 @@ SELECT jugador_id, jugador_nombre, jugador_apellido, cantidad_ganada,
  FROM jugador
  JOIN premio ON jugador.id = premio.jugador_id;
 ```
+Observamos una variabilidad impredecible de los resultados, por lo que no es común que los jugadores que ganan "en grande" repitan el premio de nuevo en sus siguientes tres ganancias.
+
   <li>Cálculo de la diferencia entre la ganancia en un sorteo específico y su ganancia más baja en ese sorteo </li>
 
 ```{postgresql}
@@ -224,6 +219,8 @@ FROM jugador
 JOIN premio ON jugador.id = premio.jugador_id
 ORDER BY jugador_id;
 ```
+Observamos números muy altos, por lo que podemos concluir que las ganancias "grandes" son poco comunes, sobretodo en los jugadores que ganan varias veces. Es decir, su ganancia más alta (o cualquiera de ellas) difiere, en lo general, en mucho de su ganancia más baja. 
+
   <li>Cálculo de la diferencia entre la cantidad ganada por jugador y su promedio del país </li>
 
 ```{postgresql}
@@ -235,6 +232,8 @@ JOIN premio ON jugador.id = premio.jugador_id
 GROUP BY jugador_id, jugador_nombre, jugador_apellido, pais_jugador_id, cantidad_ganada
 ORDER BY pais_jugador_id, jugador_id;
 ```
+Es más frecuente observar números negativos, por lo que, en general, un jugador promedio tienen ganancias bajas, aunque el promedio sea elevado por ganancias "bajas".
+
   <li>Cálculo de la ganancia promedio de un jugador en comparación con el promedio de los jugadores de su estado </li>
 
 ```{postgresql}
@@ -249,15 +248,20 @@ SELECT jugador_id,
  GROUP BY jugador_id, jugador_nombre, jugador_apellido, estado_jugador_id, cantidad_ganada
 ORDER BY estado_jugador_id, jugador_id;
 ```
+De nuevo, observamos ratios muy bajos, por lo que no existe una correlación observable que defina que un estado es "más ganador".
+
   <li>Jugadores que tienen más de un reclamo </li>
 
 ```{postgresql}
-SELECT jugador.id, COUNT(DISTINCT reclamo.id)
+SELECT jugador.id, COUNT(DISTINCT reclamo.id) AS reclamos
 FROM jugador
 INNER JOIN reclamo ON jugador_id = jugador.id
 GROUP BY jugador.id
-HAVING COUNT (DISTINCT reclamo.id) > 1;
+HAVING COUNT (DISTINCT reclamo.id) > 1
+ORDER BY reclamos DESC;
 ```
+Existen numerosos jugadores con más de un reclamo, por lo que se puede observar un patrón "adictivo" en estos tipos de juegos de lotería, aunque sus "ganancias" no sean muy significativas.
+
   <li>Ciudades con más jugadores </li>
 
 ```{postgresql}
@@ -266,22 +270,29 @@ FROM limpieza_datos.loteria
 GROUP BY ciudad_jugador
 ORDER BY COUNT(*) DESC;
 ```
+La ciudad con más jugadores es Houston (naturalmente, por estar ubicada en Texas), al igual que le siguen ciudades dentro o colindantes con Texas.
+
   <li>Cantidad ganada por los jugadores en el último mes </li>
 
 ```{postgresql}
 SELECT jugador_id, SUM(cantidad_ganada) AS total_ganado
 FROM premio
 WHERE fecha_draw >= CURRENT_DATE - INTERVAL '1 month'
-GROUP BY jugador_id;
+GROUP BY jugador_id
+ORDER BY total_ganado DESC;
 ```
+Observamos que en el último mes nadie se ha llevado el "premio grande" con ganancias máximas de 525000 dólares pero seguidas de cantidades menores a 100000.
+
   <li>Ganancias anuales por jugador </li>
 
 ```{postgresql}
-SELECT premio.jugador_id, EXTRACT(YEAR FROM fecha_draw) AS año, AVG(cantidad_ganada) AS promedio_ganado
+SELECT premio.jugador_id, EXTRACT(YEAR FROM fecha_draw) AS año, ROUND(AVG(cantidad_ganada),2) AS promedio_ganado
 FROM premio
 WHERE EXTRACT(YEAR FROM fecha_draw) IS NOT NULL
 GROUP BY premio.jugador_id, EXTRACT(YEAR FROM fecha_draw);
 ```
+Encontramos un patrón de que las ganancias anuales de los jugadores son mayores mientras más antiguo es el año, esto se puede deber a que los registros solo eran tomados de los "premios grandes" años atrás.
+
   <li>Comerciante que más premios ha vendido </li>
 
 ```{postgresql}
@@ -298,6 +309,8 @@ SELECT *
 FROM total_premios_vendidos
 WHERE premios_vendidos = (SELECT MAX(premios_vendidos) FROM total_premios_vendidos);
 ```
+Al igual que el comerciante que más reclamos ha tenido, el que más premios ha vendido es "Colonies Food Mart" con un total de 13286 premios vendidos, por lo que algún especulador de la lotería preferiría comprar allí porque es "más probable ganar" (aunque no lo sea).
+
   <li>Cantidad ganada por: </li>
   
   <ol>
@@ -311,6 +324,7 @@ WHERE premios_vendidos = (SELECT MAX(premios_vendidos) FROM total_premios_vendid
     GROUP BY pais.id, pais.nombre_pais
     ORDER BY cantidad_ganada DESC;
   ```
+El país que más dinero ha recibido en premios es Estados Unidos, seguido de México, países sin reconocer y Canadá.
 
   <li>Ciudad </li>
     
@@ -322,6 +336,7 @@ WHERE premios_vendidos = (SELECT MAX(premios_vendidos) FROM total_premios_vendid
     GROUP BY ciudad.id, ciudad.nombre_ciudad
     ORDER BY cantidad_ganada DESC;
   ```
+Las ciudades más ganadoras son aquellas en el interior o colindantes con Texas, la lista es encabezada por Houston con un total de 1340816899.26 dólares ganados.
 
   <li>Estado </li>
     
@@ -333,6 +348,7 @@ WHERE premios_vendidos = (SELECT MAX(premios_vendidos) FROM total_premios_vendid
     GROUP BY estado.id, estado.nombre_estado
     ORDER BY cantidad_ganada DESC;
   ```
+Naturalmente, el estado más ganador en cuánto a valor de premios es Texas con 12678872705.05 dólares.
 
   <li>Condado </li>
     
@@ -345,6 +361,7 @@ WHERE premios_vendidos = (SELECT MAX(premios_vendidos) FROM total_premios_vendid
     GROUP BY condado.id, condado.nombre_condado
     ORDER BY cantidad_ganada DESC;
   ```
+EL condado de Harris encabeza la lista de ganadores, con un total de 1416773477.47 dólares en premio.
 
   </ol>
 <li>Cantidad de premios y reclamos por zip </li> 
@@ -362,6 +379,7 @@ WHERE comerciante_id != 1
 GROUP BY zip, zip4
 ORDER BY premios_ganados DESC, reclamos_hechos DESC;
 ```
+EL zip que más reclamos y premios ha ganado se localiza en San Antonio.
 
   <li>Jugadores que han ganado en más ocasiones </li>
 
@@ -372,6 +390,8 @@ INNER JOIN premio ON jugador.id = premio.jugador_id
 GROUP BY jugador_id, jugador_nombre, jugador_apellido
 ORDER BY veces_ganadas DESC;
 ```
+Ha habido varios jugadores "multiganadores", encabeza la lista Mallory Neal con 20197 premios totales.
+
   <li>Ganancias del estado (la base solo incluye boletos ganadores) </li>
 
 ```{postgresql}
@@ -379,6 +399,8 @@ SELECT SUM(premio.costo_ticket - premio.cantidad_ganada) AS ganancia_estado
 FROM premio
 WHERE costo_ticket IS NOT NULL;
 ```
+De los boletos registrados (que solamente son ganadores reclamados mayores a 1 dólar) el estado ha pagado 3849517485.57 dólares.
+
   <li>Ganancias por centro de reclamo </li>
 
 ```{postgresql}
@@ -391,6 +413,8 @@ INNER JOIN premio ON reclamo.id = premio.reclamo_id
 GROUP BY centro_reclamo.id, centro_reclamo.nombre_centro_reclamo
 ORDER BY premios_ganados DESC, reclamos_hechos DESC;
 ```
+Austin Super User es el centro de reclamo con más premios y reclamos registrados, encabezando la lista igualmente con valor monetario.
+
   <li>Proporción de ciudadanos estadounidenses vs extranjeros que ganan premios </li>
 
 ```{postgresql}
@@ -405,6 +429,8 @@ WITH premios_estadounidenses AS (
 SELECT ciudadano_usa, ROUND(premios_ganados / (SELECT SUM(premios_ganados) FROM premios_estadounidenses), 2) * 100
 FROM premios_estadounidenses;
 ```
+El ratio de ganadores de premios de lotería de estadounidenses vs extranjeros es de 87/13 en favor de los estadounidenses.
+
   <li>Promedio de cantidad ganada según anonimato </li>
 
 ```{postgresql}
@@ -413,6 +439,7 @@ FROM reclamo
 INNER JOIN public.premio ON reclamo.id = premio.reclamo_id
 GROUP BY anonimo;
 ```
+Los jugadores que desean permanecer anónimos ganan en promedio 2552621.79, mientras que los que no declaran anonimato 4381.54 dólares, por lo que los jugadores anónimos ganan, en promedio, 582 veces más.
 
   <li>Promedio de cantidad ganada según anualidad </li>
 
@@ -422,6 +449,7 @@ FROM reclamo
 INNER JOIN public.premio ON reclamo.id = premio.reclamo_id
 GROUP BY anualidad;
 ```
+De la misma forma, los jugadores que desean anualidad ganan en promedio 7957747.14, mientras que los que optan por no-anualidad 3415.13.
 
   <li>Se gana más dinero en especie o mercancía </li>
 
@@ -430,6 +458,7 @@ SELECT especie_dinero, AVG(cantidad_ganada)
 FROM premio
 GROUP BY especie_dinero;
 ```
+Se gana el doble de dinero en premios de mercanía.
 
   <li>Nivel de premio más ganado </li>
 
@@ -440,6 +469,7 @@ WHERE nivel_premio != 'UNKNOWN'
 GROUP BY nivel_premio
 ORDER BY veces_ganadas DESC;
 ```
+Los niveles de premio que más ganan son Straight Box 24 y Straight.
 
   <li>Tipo de lotería más usado </li>
 
@@ -449,6 +479,7 @@ FROM premio
 GROUP BY tipo_loteria
 ORDER BY veces_ganadas DESC;
 ```
+El tipo de lotería que más gana premios, según el volumen total de ventas son los "Scratch Tickets".
 
   <li>Momento del día en el que más se reclaman premios </li>
 
@@ -459,6 +490,7 @@ WHERE momento_dia_draw != 'UNKNOWN'
 GROUP BY momento_dia_draw
 ORDER BY veces_ganadas DESC;
 ```
+Observamos un patrón de reclamo en el que mientras más tarde, más reclamos hay.
 
   <li>Jugadores </li>
 
@@ -492,16 +524,13 @@ HAVING COUNT(*) > 10 AND
        AVG(premio.cantidad_ganada) > (SELECT AVG(cantidad_ganada) FROM premio)
 ORDER BY total_premio DESC;
 ```
-
+Esta fue una última consulta en la que decidimos emplear muchas de las funciones comunes en SQL para observar hasta que punto puede una consulta densa en estructura, dar un resultado que pueda ser entendible. La consulta arrojó solo 3 individuos que cumplen con las condiciones.
 
 </ol>
 
 
 ## Creación de atributos para entrenamiento de modelos
-
-<p style="text-align: justify;">
 Como parte del análisis de la base de dato, decidimos implementar ciertas columnas que pueden después ser utilizadas para el entrenamiento de modelos. Cabe mencionar que el entrenamiento de modelos no fue llevado a cabo pero estas columnas brindan lo necesario para llevarlo a cabo. Por esto, se presenta a continuación una descripción de las columnas generadas, su consulta necesaria en SQL (que pueden ser igualmente consultadas al final del script `querys.sql`) y la posible aplicación en entrenamiento de modelos.
-</p>
 
 ### 1) Columna para conocer cuaáto dinero acumulado ganó el jugador
 ```{postgresql}
