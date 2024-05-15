@@ -113,7 +113,7 @@ Una vez termiando el análisis de las FDs y las MVDs pudimos normalizar hasta 4N
 
 Podemos observar que en esta descoposición ya no se encuentran FDs que no salgan de súper llaves ni MVDs que no salgan de súper llaves. Esto es, a partir de una llave en la tabla (en todas se les dió el nombre al atributo de id) podemos obtener la información única contenida en la tabla y ya no existe información independiente en la misma tabla, sino que fue separada para que hubiera coherencia. Finalmente, tenemos este esquema para las tablas:
 
-<img src="Desktop/ERD Loteria.jpeg" alt="ERD Loteria">
+![ERD Loteria](Varios/ERD Loteria.png)
 
 
 ## Análisis de datos a través de consultas de SQL
