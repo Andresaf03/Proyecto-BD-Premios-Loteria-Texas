@@ -466,7 +466,7 @@ FROM premio
 GROUP BY especie_dinero;
 ```
 Se gana el doble de dinero en premios de mercanía.
-![Especia_Mercancia](Varios/Especia_Mercancia.jpeg)
+![Especia_Mercancia](Varios/Especia_Mercancía.jpeg)
 
   <li>Nivel de premio más ganado </li>
 
