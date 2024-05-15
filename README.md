@@ -292,6 +292,7 @@ WHERE EXTRACT(YEAR FROM fecha_draw) IS NOT NULL
 GROUP BY premio.jugador_id, EXTRACT(YEAR FROM fecha_draw);
 ```
 Encontramos un patrón de que las ganancias anuales de los jugadores son mayores mientras más antiguo es el año, esto se puede deber a que los registros solo eran tomados de los "premios grandes" años atrás.
+![Cantidad_Meses](Varios/Cantidad_Meses.jpeg)
 
   <li>Comerciante que más premios ha vendido </li>
 
@@ -444,6 +445,7 @@ INNER JOIN public.premio ON reclamo.id = premio.reclamo_id
 GROUP BY anonimo;
 ```
 Los jugadores que desean permanecer anónimos ganan en promedio 2552621.79, mientras que los que no declaran anonimato 4381.54 dólares, por lo que los jugadores anónimos ganan, en promedio, 582 veces más.
+![Anonimato](Varios/Anonimato.jpeg)
 
   <li>Promedio de cantidad ganada según anualidad </li>
 
@@ -454,6 +456,7 @@ INNER JOIN public.premio ON reclamo.id = premio.reclamo_id
 GROUP BY anualidad;
 ```
 De la misma forma, los jugadores que desean anualidad ganan en promedio 7957747.14, mientras que los que optan por no-anualidad 3415.13.
+![Anualidad](Varios/Anualidad.jpeg)
 
   <li>Se gana más dinero en especie o mercancía </li>
 
@@ -463,6 +466,7 @@ FROM premio
 GROUP BY especie_dinero;
 ```
 Se gana el doble de dinero en premios de mercanía.
+![Especia_Mercancia](Varios/Especia_Mercancia.jpeg)
 
   <li>Nivel de premio más ganado </li>
 
@@ -495,6 +499,7 @@ GROUP BY momento_dia_draw
 ORDER BY veces_ganadas DESC;
 ```
 Observamos un patrón de reclamo en el que mientras más tarde, más reclamos hay.
+![Momento_dia](Varios/Momento_dia.jpeg)
 
   <li>Jugadores que han ganado más en su país, con más de 10 reclamos y un promedio de ganancias mayor al de su país </li>
 
