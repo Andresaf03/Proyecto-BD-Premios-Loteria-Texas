@@ -1,3 +1,4 @@
+<p style="text-align: justify;">
 # Proyecto BD: Premios lotería Texas
 
 ## Integrantes
@@ -552,3 +553,5 @@ Un último modelo podría aprender a precedir (aunque se trate de un juego de pr
 ## Conclusiones
 
 a
+
+</p>
