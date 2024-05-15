@@ -603,9 +603,9 @@ WHERE ciudad.id = ganancia_promedio_ciudad.ciudad_id;
 ```
 Un último modelo podría aprender a precedir (aunque se trate de un juego de probabilidad) que ciudades son más propensas a ganar un mayor premio, tomando en cuenta otros factores como el tipo de boleto o tipo de juego.
 
-*Nota: es importante mencionar que los datos de esta base de datos incluyen únicamente a los ganadores de los premios.
+*Nota: es importante mencionar que los datos de esta base de datos incluyen únicamente a los ganadores de los premios; las gráficas se realizaron ya sea en Excel o utilizando python con los paquetes de pandas, psycopg2, sqlalchemy y matplotlib que puede ser consultado en el script `Loteria_Texas.py`
 
 ## Conclusiones
 
-a
+
 
