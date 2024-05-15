@@ -492,7 +492,7 @@ ORDER BY veces_ganadas DESC;
 ```
 Observamos un patrón de reclamo en el que mientras más tarde, más reclamos hay.
 
-  <li>Jugadores </li>
+  <li>Jugadores que han ganado más en su país, con más de 10 reclamos y un promedio de ganancias mayor al de su país </li>
 
 ```{postgresql}
 SELECT
