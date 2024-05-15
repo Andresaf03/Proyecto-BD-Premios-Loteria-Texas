@@ -116,7 +116,7 @@ Una vez termiando el análisis de las FDs y las MVDs pudimos normalizar hasta 4N
     <li>Zip4: {id, zip4} </li>
 </ul>
 
-Podemos observar que en esta descoposición ya no se encuentran FDs que no salgan de súper llaves ni MVDs que no salgan de súper llaves. Esto es, a partir de una llave en la tabla (en todas se les dió el nombre al atributo de id) podemos obtener la información única contenida en la tabla y ya no existe información independiente en la misma tabla, sino que fue separada para que hubiera coherencia. Finalmente, tenemos este esquema para las tablas:
+Podemos observar que en esta descoposición ya no se encuentran FDs que no salgan de súper llaves ni MVDs que no salgan de súper llaves. Es importante mencionar que en el script no incluimos restricciones de CHECK, UNIQUE y NOT NULL porque en algunas no era posible y en otras no tenían sentido. Esto es, a partir de una llave en la tabla (en todas se les dió el nombre al atributo de id) podemos obtener la información única contenida en la tabla y ya no existe información independiente en la misma tabla, sino que fue separada para que hubiera coherencia. Finalmente, tenemos este esquema para las tablas:
 
 ![ERD Loteria](Varios/ERD_Loteria.png)
 *Notar que las columnas suma_gamada, tardanza_recogida, veces_ganador, precio_ganancia y ganancia_promedio fueron añadidas posteriormente como atributos para entrenamiento de modelos.
@@ -607,5 +607,5 @@ Un último modelo podría aprender a precedir (aunque se trate de un juego de pr
 
 ## Conclusiones
 
-
+Este fue sin duda un proyecto desafiante que requirió del uso de todos nuestros conocimientos. Por un lado, pudimos profundizar y prácticar las habilidades que ya teníamos desarolladas como el manejo de una base de datos a través de consultas de SQL, la creación de tablas y restricciones dentro de las tablas, y la normalización de una base de datos para reducir redundancia. Por otro lado, adquirimos nuevos conocimientos en los ámbitos de importación de grandes conjuntos de datos, limpieza de datos a través de funciones de SQL e inspección tuplar, y la generación de ideas (y columnas) para un posible entrenamiento de modelo. Creemos que lo más desafiante fue la limpieza de datos por la cantidad de errores que contenía el conjunto de datos desde el origen, pero justamente por esto pudimos comenzar a generar ideas sobre posibles consultas y cómo normalizaríamos la base de datos. En cuanto a los resultados obtenidos, estamos muy satisfechos con la variedad de consultas que realizamos, esto se debe a que dentro de ellas utilizamos diversas funciones de SQL y métodos de extracción de datos para poder analizar algo tan abstracto y arbitrario como los registros de los ganadores de una lotería. No descartamos en un futuro poder emplear estos resultados, completos o parciales, para poder entrenar ciertos modelos que se beneficien de los atributos generados a partir de la información existente. En suma, consideramos que fue un proyecto exitoso que necesitó de un constante esfuerzo, no solamente para emplear todo tipo de conocimientos, sino para aprender sobre la marcha y poder entregar resultados visibles.
 
