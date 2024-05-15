@@ -1,4 +1,3 @@
-<p style="text-align: justify;">
 # Proyecto BD: Premios lotería Texas
 
 ## Integrantes
@@ -9,7 +8,9 @@
 
 
 ## Introducción al conjunto de datos y al problema a estudiar
+<p style="text-align: justify;">
 El presente conjunto de datos es una recopilación de premios de lotería ganados en Texas (cabe mencionar que los datos tomados fueron por última vez actualizados el 30 de abril de 2024 en el momento de extracción, aunque sean actualizados periódicamente, y fueron creados el 1 de septiembre de 2023, aunque hay registros anteriores al 2023). El conjunto de datos original consta de:
+</p>
 <ul>
     <li>35 columnas </li>
     <li>2.7 millones de renglones (cada uno es un registro de un premio ganado) </li>
@@ -24,16 +25,22 @@ Las columnas contienen información alrededor del premio que fue ganado, algunas
     <li>Información del jugador </li>
     <li>Información del comerciante </li>
 </ul>
+<p style="text-align: justify;">
 A primera vista el conjunto no está normalizado y existen aún ciertas dependencias multivaluadas que tendrán que ser corregidas para separar la información independiente en diferentes relaciones. De la misma manera, el conjunto de datos proporciona la información del premio ganado, del jugador y del comerciante que vendió el ticket de las diferentes loterias. La mayoría de los atributos estan en formato de texto simple y parece que hay algunos que pueden ser utilizados posteriormente como llaves primarias de las relaciones que se definirán en un futuro. Este conjunto de datos no es solo local, sino que incluye a ganadores de diferentes regiones del mundo, aunque los premios reclamados deben ser en Texas. Nuestro principal propósito es analizar, a través de consultas de SQL y conocimiento general de bases de datos, ciertos patrones observables en los ganadores y como se lleva a cabo la recopilación de datos y la recolección de premios. Esto es, aplicar los conocimientos aprendidos durante el curso para analizar una base de datos compleja, desde el ingesto inicial desde una fuente datos hasta la creación de atributos para un posible futuro entrenamiento de modelos. En cuanto a las consideraciones e implicaciones éticas consideramos que no hay ninguna, ya que la fuente de datos incluye la opción de mantenerse anónimo para ganadores de premios con valor mayor a 1 millon de dólares. El propósito de este repositorio es la explicación de las decisiones tomadas durante el proyecto para la realización de consultas analíticas y la replicación del mismo.
+</p>
 
 
 ## Fuente de datos
+<p style="text-align: justify;">
 Para este proyecto se utilizaron los datos obtenidos del portal público de datos del estado de Texas sobre la lista de ganadores de premios de loteria (actualizada por última vez el 30 de abril de 2024). Se consultar los datos en [este link](https://data.texas.gov/dataset/Winners-List-of-Texas-Lottery-Prizes/54pj-3dxy/about_data). 
+</p>
 
 
 ## Carga inicial de datos y análisis preeliminar
 
+<p style="text-align: justify;">
 Para insertar los datos en bruto en una sola tabla que los contenga todos se debe primero ejecutar el script `raw_data_esquema_tabla.sql` en el IDE de su preferencia. Posteriormente, en una sesión de terminal 'SQL Shell' crear una base de datos con un nombre a elección con el comando:
+</p>
 
 ```{postgresql}
 \CREATE DATABASE nombre_a_elegir;
@@ -56,25 +63,29 @@ De esta forma, ya se tendrá en el IDE una sola tabla con toda la información d
 
 ## Limpieza de datos
 
+<p style="text-align: justify;">
 El proceso de limpieza de datos se puede ver en el scrpit llamado: ```limpieza_datos.sql```. Este se realiza de tal manera que cada vez que se ejecute el script completo se hará la limpieza entera de los datos, desde la creación de cero del esquema y las consultas necesarias para ir limpiando las columnas que así lo requieran. Encontramos diversos problemas en esta tabla al momento de la limpieza que debimos solucionar:
-<ul>
-  <li>Prácticamente todas las columnas no eran consistentes con su formato de texto (contenían caracteres en minúsculas y mayúsculas, y contenían espacios al inicio y final de los registros), por lo que lo solucionamos con funciones de TRIM() y UPPER(). </li>
-  <li>Las fechas registradas en el conjunto de datos decían tener la hora cuando no los tenían, por lo que tuvimos que cambiar su tipo a DATE en lugar de TIMESTAMP. </li>
-  <li>El id, a pesar de ser único, era muy difícil de leer y contenía tanto números como caracteres, por lo que decidimos dar un nuevo id único que fuera más fácil de manejar con un BIGSERIAL y eliminando el anterior. </li>
-  <li>Los indicadores de anualidad y anonimato solamente tenían dos registros distintos (YES y NO) por lo que los convertimos en valores booleanos siguiendo el estándar (igualmente ciudadano_USA podría ser un booleano pero contenía registros de UNKNOWN y NOT PROVIDED, por lo que no pudimos realizar la limpieza en ese atributo). </li>
-  <li>Los id de jugador y reclamo se repetían, lo que tiene sentido si consideramos que un jugador puede tener muchos premios y un reclamo puede contener muchos premios, el problema fue que el id de reclamo no era único, es decir, existían reclamos distintos con con el mismo identificador. Por lo anterior, decidimos observar cuales tenían el conflicto (más de 500000 registros) para crear una secuencia y asignar nuevos números de reclamo para que no se duplicaran, cuidado que los nuevos no estuvieran ya en el conjunto de datos (inicializando la secuencia en un número superior al id de reclamo mayor). </li>
-  <li>Si el id de jugador era nulo lo hicimos igual a -1 (no repetido). </li>
-  <li>Eliminamos un par de columnas (nombre_y_id_jugador y numero_nombre_comerciante) que contenían información obsoleta, ya que eran una concatenación de columnas con información que ya contenía el conjunto de datos. Hicimos esto cuidando que estas columnas fueran consistente con la información que concatenaban de otras columnas. </li>
-  <li>Las columnas de ciudad_jugador, estado_jugador, condado_jugador, pais_jugador, ciudad_comerciante, estado_comerciante y condado comerciante todas tenían algunos errores de dedo al momento de insertar la información al conjunto de datos. Es decir, había nombres que hacían referencia al mismo sitio pero estaban escritos de forma incorrecta, por lo que tuvimos que corregirlos con las funciones de CASE: WHEN revisando entrada por entrada. Debemos hacer una mención especial a la columna de ciudad_jugador, esta columna contenía más de 14500 valores distintos y requerimos de 1600 líneas de código para limpiarlas porque había demasiadas inconsistencias en la escritura de las mismas. Así, pudimos obtener una(s) columna(s) consistente(s) para que efectivamente arrojaran los resultados deseados en las consultas. </li>
-  <li>Las columnas de tipo_loteria, momento_dia_draw y nivel_premio requirieron de una limpieza mínima para eliminar caracteres no desearlos y que los registros contenidos fueran consistentes. </li>
-  <li>Había una gran cantidad de columnas que contenían valores nulos no explícitos (esto es, palabras para representar un valor nulo), por lo que los adaptamos el estándar y los hicimos nulos. </li>
-</ul>
+  <ul>
+    <li>Prácticamente todas las columnas no eran consistentes con su formato de texto (contenían caracteres en minúsculas y mayúsculas, y contenían espacios al inicio y final de los registros), por lo que lo solucionamos con funciones de TRIM() y UPPER(). </li>
+    <li>Las fechas registradas en el conjunto de datos decían tener la hora cuando no los tenían, por lo que tuvimos que cambiar su tipo a DATE en lugar de TIMESTAMP. </li>
+    <li>El id, a pesar de ser único, era muy difícil de leer y contenía tanto números como caracteres, por lo que decidimos dar un nuevo id único que fuera más fácil de manejar con un BIGSERIAL y eliminando el anterior. </li>
+    <li>Los indicadores de anualidad y anonimato solamente tenían dos registros distintos (YES y NO) por lo que los convertimos en valores booleanos siguiendo el estándar (igualmente ciudadano_USA podría ser un booleano pero contenía registros de UNKNOWN y NOT PROVIDED, por lo que no pudimos realizar la limpieza en ese atributo). </li>
+    <li>Los id de jugador y reclamo se repetían, lo que tiene sentido si consideramos que un jugador puede tener muchos premios y un reclamo puede contener muchos premios, el problema fue que el id de reclamo no era único, es decir, existían reclamos distintos con con el mismo identificador. Por lo anterior, decidimos observar cuales tenían el conflicto (más de 500000 registros) para crear una secuencia y asignar nuevos números de reclamo para que no se duplicaran, cuidado que los nuevos no estuvieran ya en el conjunto de datos (inicializando la secuencia en un número superior al id de reclamo mayor). </li>
+    <li>Si el id de jugador era nulo lo hicimos igual a -1 (no repetido). </li>
+    <li>Eliminamos un par de columnas (nombre_y_id_jugador y numero_nombre_comerciante) que contenían información obsoleta, ya que eran una concatenación de columnas con información que ya contenía el conjunto de datos. Hicimos esto cuidando que estas columnas fueran consistente con la información que concatenaban de otras columnas. </li>
+    <li>Las columnas de ciudad_jugador, estado_jugador, condado_jugador, pais_jugador, ciudad_comerciante, estado_comerciante y condado comerciante todas tenían algunos errores de dedo al momento de insertar la información al conjunto de datos. Es decir, había nombres que hacían referencia al mismo sitio pero estaban escritos de forma incorrecta, por lo que tuvimos que corregirlos con las funciones de CASE: WHEN revisando entrada por entrada. Debemos hacer una mención especial a la columna de ciudad_jugador, esta columna contenía más de 14500 valores distintos y requerimos de 1600 líneas de código para limpiarlas porque había demasiadas inconsistencias en la escritura de las mismas. Así, pudimos obtener una(s) columna(s) consistente(s) para que efectivamente arrojaran los resultados deseados en las consultas. </li>
+    <li>Las columnas de tipo_loteria, momento_dia_draw y nivel_premio requirieron de una limpieza mínima para eliminar caracteres no desearlos y que los registros contenidos fueran consistentes. </li>
+    <li>Había una gran cantidad de columnas que contenían valores nulos no explícitos (esto es, palabras para representar un valor nulo), por lo que los adaptamos el estándar y los hicimos nulos. </li>
+  </ul>
+</p>
 
 Al finalizar la limpieza terminamos con una fuente de datos manejable y coherente en sus registros. Si bien es cierto que existen algunos valores nulos por falta de registros por parte de la fuente misma, creemos que la masividad de los datos nos permitirá extraer datos suficientemente relevantes,
 
 ## Normalización de datos hasta cuarta forma normal
 
+<p style="text-align: justify;">
 El proceso de normalización consiste en la descomposición de una entidad (tabla) en diversas para que mantengan ciertos requisitos (según la forma normal deseada) y obtengan coherencia. Este proceso fue realizado de tal forma que se puede consultar en el script `normalizacion.sql` y fue hecho de forma que se ejecute todo el script de corrido y en cualquier momento pueda ser eliminado para comenzar de nuevo. Algunos de los retos enfrentados en este proceso fueron: la organización de tablas según su id único, es decir, que una consulta general del tipo:
+</p>
 ```{postgresql}
 SELECT *
 FROM nombre_tabla;
@@ -119,14 +130,18 @@ Una vez termiando el análisis de las FDs y las MVDs pudimos normalizar hasta 4N
     <li>Zip4: {id, zip4} </li>
 </ul>
 
+<p style="text-align: justify;">
 Podemos observar que en esta descoposición ya no se encuentran FDs que no salgan de súper llaves ni MVDs que no salgan de súper llaves. Esto es, a partir de una llave en la tabla (en todas se les dió el nombre al atributo de id) podemos obtener la información única contenida en la tabla y ya no existe información independiente en la misma tabla, sino que fue separada para que hubiera coherencia. Finalmente, tenemos este esquema para las tablas:
+</p>
 
 ![ERD Loteria](Varios/ERD_Loteria.png)
 *Notar que las columnas suma_gamada, tardanza_recogida, veces_ganador, precio_ganancia y ganancia_promedio fueron añadidas posteriormente como atributos para entrenamiento de modelos.
 
 ## Análisis de datos a través de consultas de SQL
 
+<p style="text-align: justify;">
 Se realizaron diversas consultas de SQL para el análisis de la base de datos, estas revelarán información valiosa que nos ayudará en nuestra conclusión para observar ciertos patrones de consumo, geolocalización y tipo de jugadores más propensos a ganar premios según atributos arbitrarios. A continuación se presentan las consultas realizadas (que pueden ser vistas en el script `querys.sql` que incluye igualmente el traspaso de las tablas al esquema público) con su correspondiente código y resultados.
+</p>
 
 <ol>
   <li>Suma de la cantidad ganada por cada jugador </li>
@@ -484,7 +499,9 @@ ORDER BY total_premio DESC;
 
 ## Creación de atributos para entrenamiento de modelos
 
+<p style="text-align: justify;">
 Como parte del análisis de la base de dato, decidimos implementar ciertas columnas que pueden después ser utilizadas para el entrenamiento de modelos. Cabe mencionar que el entrenamiento de modelos no fue llevado a cabo pero estas columnas brindan lo necesario para llevarlo a cabo. Por esto, se presenta a continuación una descripción de las columnas generadas, su consulta necesaria en SQL (que pueden ser igualmente consultadas al final del script `querys.sql`) y la posible aplicación en entrenamiento de modelos.
+</p>
 
 ### 1) Columna para conocer cuaáto dinero acumulado ganó el jugador
 ```{postgresql}
@@ -554,4 +571,3 @@ Un último modelo podría aprender a precedir (aunque se trate de un juego de pr
 
 a
 
-</p>
